@@ -15,11 +15,11 @@
         <tbody>
             <tr v-for="(row, j) in rows" :key="j">
                 <td v-for="(col, i) in sortTableCols" :key="i">
-                    <div v-if="isEditing(i, j)" contenteditable="true" @keypress.enter="endEditing" @blur="endEditing">
-                        {{ cell(i, j) }}
+                    <div v-if="isEditing(i, j)">
+                        <cell-editor :value="cell(i, j)" @endEditing="endEditing" />
                     </div>
                     <div v-else @click="setEditing(i, j)">
-                        <cell-renderer :cell="cell(i, j)" :col="col" ></cell-renderer>
+                        <cell-renderer :cell="cell(i, j)" :col="col" />
                     </div>
                 </td>
             </tr>
@@ -31,9 +31,10 @@
     import _ from 'lodash';
     import TableCol from "@/TableCol";
     import CellRenderer from "@/CellRenderer";
+    import CellEditor from "@/CellEditor";
     export default {
         name: "VTable",
-        components: { CellRenderer },
+        components: {CellEditor, CellRenderer },
         props: {
             columns: { type: Array },
             rows: { type: Array, required: true },
@@ -61,19 +62,16 @@
                 return !(row instanceof Array) && alias ? row[alias] : row[originalIndex];
             },
             endEditing(value) {
-                this.$emit(
-                    'newValue',
-                    value,
-                    this.sortTableCols[this.cellEditing.i].originalIndex,
-                    this.cellEditing.j
-                );
-                this.setEditing(-1, -1);
+                const { originalIndex, alias } = this.sortTableCols[this.cellEditing.i];
+                const i = !(this.rows[this.cellEditing.j] instanceof Array) && alias ? alias : originalIndex;
+                this.$emit('newValue', value, i, this.cellEditing.j);
+                this.cellEditing = { i: -1, j: -1 }
             },
             isEditing(i, j) {
                 return this.cellEditing.i === i && this.cellEditing.j === j;
             },
             setEditing(i, j) {
-                this.cellEditing = { i, j };
+                if (i >=0 && this.sortTableCols[i].editable) this.cellEditing = { i, j };
             },
             sorting(i) {
                 const col = this.sortTableCols[i];

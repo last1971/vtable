@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-      <v-table :rows="rows" :columns="columns"></v-table>
+      <v-table :rows="rows" :columns="columns" @newValue="newValue" />
   </div>
 </template>
 
@@ -16,10 +16,10 @@ export default {
   data() {
     return {
       columns: [
-          { name: 'First', alias: 'a', index: 2, sortable: true, customRenderer: TestCellRenderer },
+          { name: 'First', alias: 'a', index: 2, sortable: true, customRenderer: TestCellRenderer, editable: true },
           { name: 'Second', alias: 'b', index: 3, type: 'number' },
           { name: '3ii', alias: 'z', index: 1 },
-          { name: 'Chetvertii', alias: 'r', index: 0, sortable: true, type: 'html' },
+          { name: 'Chetvertii', alias: 'r', index: 0, sortable: true, type: 'html', editable: true },
       ],
       rows: [
         ['A', 'B', 'C', 'D'],
@@ -27,7 +27,12 @@ export default {
         { a: 'TY', b: 1212, z: '78', r: '<i>IIIII</i>' },
       ]
     }
-  }
+  },
+    methods: {
+        newValue(value, i, j) {
+            this.rows[j][i] = value;
+        }
+    }
 }
 </script>
 
