@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-      <v-table :rows="rows" :columns="columns" @newValue="newValue" />
+      <g-table :rows="rows" :columns="columns" @newValue="newValue" />
   </div>
 </template>
 
 <script>
-import VTable from "@/VTable";
+import GTable from "@/GTable";
 import TestCellRenderer from "@/TestCellRenderer";
 
 export default {
   name: 'app',
   components: {
-      VTable
+      GTable
   },
   data() {
     return {
