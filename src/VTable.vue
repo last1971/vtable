@@ -14,7 +14,14 @@
         </thead>
         <tbody>
             <tr v-for="(row, j) in rows" :key="j">
-                <td v-for="(col, i) in sortTableCols" :key="i">{{ cell(i, j) }}</td>
+                <td v-for="(col, i) in sortTableCols" :key="i">
+                    <div v-if="isEditing(i, j)" contenteditable="true" @keypress.enter="endEditing" @blur="endEditing">
+                        {{ cell(i, j) }}
+                    </div>
+                    <div v-else @click="setEditing(i, j)">
+                        <cell-renderer :cell="cell(i, j)" :col="col" ></cell-renderer>
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -23,8 +30,10 @@
 <script>
     import _ from 'lodash';
     import TableCol from "@/TableCol";
+    import CellRenderer from "@/CellRenderer";
     export default {
         name: "VTable",
+        components: { CellRenderer },
         props: {
             columns: { type: Array },
             rows: { type: Array, required: true },
@@ -32,6 +41,7 @@
         data() {
             return {
                 tableCols: [],
+                cellEditing: { i: -1, j: -1 },
             }
         },
         created() {
@@ -49,6 +59,21 @@
                 const { originalIndex, alias } = this.sortTableCols[i];
                 const row = this.rows[j];
                 return !(row instanceof Array) && alias ? row[alias] : row[originalIndex];
+            },
+            endEditing(value) {
+                this.$emit(
+                    'newValue',
+                    value,
+                    this.sortTableCols[this.cellEditing.i].originalIndex,
+                    this.cellEditing.j
+                );
+                this.setEditing(-1, -1);
+            },
+            isEditing(i, j) {
+                return this.cellEditing.i === i && this.cellEditing.j === j;
+            },
+            setEditing(i, j) {
+                this.cellEditing = { i, j };
             },
             sorting(i) {
                 const col = this.sortTableCols[i];
