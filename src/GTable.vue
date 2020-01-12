@@ -29,9 +29,9 @@
 
 <script>
     import _ from 'lodash';
-    import TableCol from "@/TableCol";
-    import CellRenderer from "@/CellRenderer";
-    import CellEditor from "@/CellEditor";
+    import TableCol from "./TableCol";
+    import CellRenderer from "./CellRenderer";
+    import CellEditor from "./CellEditor";
     export default {
         name: "VTable",
         components: {CellEditor, CellRenderer },
