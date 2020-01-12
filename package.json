@@ -1,6 +1,6 @@
 {
   "name": "@last1971/g-table",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Vue Table Grid",
   "author": "me",
   "license": "MIT",
@@ -8,8 +8,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build-lib": "vue-cli-service build --target lib --name g-table src/index.js",
     "lint": "vue-cli-service lint"
   },
+  "main": "dist/g-table.common.js",
   "dependencies": {
     "core-js": "^3.4.4",
     "vue": "^2.6.10"
@@ -21,7 +23,8 @@
     "babel-eslint": "^10.0.3",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "webpack-cli": "^3.3.10"
   },
   "eslintConfig": {
     "root": true,

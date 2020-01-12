@@ -3,11 +3,11 @@
         <thead>
             <tr>
                 <th v-for="(col, i) in sortTableCols" :key="i">
-                    <div>{{ col.name }}</div>
-                    <div v-if="col.sortable" @click="sorting(i)">
+                    <div class="header">{{ col.name }}</div>
+                    <div v-if="col.sortable" @click="sorting(i)" class="header">
                         <span v-if="col.orderBy === 'ASC'">\/</span>
                         <span v-else-if="col.orderBy === 'DESC'">/\</span>
-                        <span v-else>--</span>
+                        <span v-else> -- </span>
                     </div>
                 </th>
             </tr>
@@ -16,7 +16,7 @@
             <tr v-for="(row, j) in rows" :key="j">
                 <td v-for="(col, i) in sortTableCols" :key="i">
                     <div v-if="isEditing(i, j)">
-                        <cell-editor :value="cell(i, j)" @endEditing="endEditing" />
+                        <component :is="cellEditor(i)" :value="cell(i, j)" @endEditing="endEditing" />
                     </div>
                     <div v-else @click="setEditing(i, j)">
                         <cell-renderer :cell="cell(i, j)" :col="col" />
@@ -31,10 +31,10 @@
     import _ from 'lodash';
     import TableCol from "./TableCol";
     import CellRenderer from "./CellRenderer";
-    import CellEditor from "./CellEditor";
+    import StringEditor from "./StringEditor";
     export default {
         name: "VTable",
-        components: {CellEditor, CellRenderer },
+        components: { StringEditor, CellRenderer },
         props: {
             columns: { type: Array },
             rows: { type: Array, required: true },
@@ -53,7 +53,7 @@
         computed: {
             sortTableCols() {
                return _.sortBy(this.tableCols.filter((col) => col.visible), ['index']);
-            }
+            },
         },
         methods: {
             cell(i, j) {
@@ -61,11 +61,17 @@
                 const row = this.rows[j];
                 return !(row instanceof Array) && alias ? row[alias] : row[originalIndex];
             },
+            cellEditor(i) {
+                if (this.sortTableCols[i].customEditor) return this.sortTableCols[i].customEditor;
+                return StringEditor;
+            },
             endEditing(value) {
-                const { originalIndex, alias } = this.sortTableCols[this.cellEditing.i];
-                const i = !(this.rows[this.cellEditing.j] instanceof Array) && alias ? alias : originalIndex;
-                this.$emit('newValue', value, i, this.cellEditing.j);
-                this.cellEditing = { i: -1, j: -1 }
+                if (this.cellEditing.i >= 0) {
+                    const {originalIndex, alias} = this.sortTableCols[this.cellEditing.i];
+                    const i = !(this.rows[this.cellEditing.j] instanceof Array) && alias ? alias : originalIndex;
+                    this.$emit('newValue', value, i, this.cellEditing.j);
+                    this.cellEditing = {i: -1, j: -1}
+                }
             },
             isEditing(i, j) {
                 return this.cellEditing.i === i && this.cellEditing.j === j;
@@ -85,5 +91,8 @@
 </script>
 
 <style scoped>
-
+    .header {
+        float: left;
+        margin-left: 2pt;
+    }
 </style>
