@@ -15,7 +15,8 @@ export default class TableCol {
         this.editable = tableCol.editable || this.editable;
         this.index = tableCol.index >= 0 ? tableCol.index : i;
         this.name = tableCol.name || abc[i];
-        this.orderBy= tableCol.orderBy || this.orderBy;
+        this.orderBy = tableCol.orderBy || this.orderBy;
+        this.orderByIndex = tableCol.orderByIndex || this.orderByIndex;
         this.originalIndex = i;
         this.sortable = tableCol.sortable || this.sortable;
         this.type = this.customRenderer ? 'custom' : tableCol.type || this.type;
@@ -56,6 +57,11 @@ export default class TableCol {
      * @type {string} - NONE,ASC,DESC
      */
     orderBy = 'NONE';
+    /**
+     * OrderBy Index
+     * @type {number|null}
+     */
+    orderByIndex = null;
     /**
      * Column original index
      * @type {number}

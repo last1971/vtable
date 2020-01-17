@@ -4,7 +4,7 @@
             <tr>
                 <th v-for="(col, i) in sortTableCols" :key="i">
                     <div class="header">{{ col.name }}</div>
-                    <sorter :value="sortTableCols[i]" @input="sorting"/>
+                    <sorter v-if="col.sortable" :value="sortTableCols[i]" @input="sorting"/>
                 </th>
             </tr>
         </thead>
@@ -47,11 +47,21 @@
             this.tableCols = this.columns
                 ? this.columns.map((col, i) => new TableCol(col, i))
                 : this.rows[0].map((col, i) => new TableCol({}, i));
+            const colWithOrderBy = this.tableCols.filter((value) => value.sortable);
+            if (colWithOrderBy.filter((value) => _.isNull(value.orderByIndex) && value.orderBy !== 'NONE').length > 0) {
+                let i = 0;
+                for (const col of colWithOrderBy) col.orderByIndex = i++;
+            }
         },
         computed: {
             sortTableCols() {
                return _.sortBy(this.tableCols.filter((col) => col.visible), ['index']);
             },
+            orderByCols() {
+                return this.tableCols
+                    .filter((value) => value.sortable && !_.isNull(value.orderByIndex))
+                    .sort((a, b) => a.orderByIndex - b.orderByIndex);
+            }
         },
         methods: {
             cell(i, j) {
@@ -79,6 +89,16 @@
                 if (i >=0 && this.sortTableCols[i].editable) this.cellEditing = { i, j };
             },
             sorting(col) {
+                if (col.orderBy === 'NONE') {
+                    for (const nextCol of this.orderByCols) {
+                        if (nextCol.orderByIndex === col.orderByIndex) nextCol.orderByIndex = null;
+                        else if (nextCol.orderByIndex > col.orderByIndex) nextCol.orderByIndex -= 1;
+                    }
+                } else if (col.orderBy === 'ASC') {
+                    this.tableCols[col.originalIndex].orderByIndex = this.orderByCols.length === 0
+                        ? 0
+                        : _.last(this.orderByCols).orderByIndex + 1;
+                }
                 this.tableCols[col.originalIndex].orderBy = col.orderBy;
                 this.$emit('orderBy', col.alias || col.originalIndex, col.orderBy);
             }
