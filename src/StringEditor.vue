@@ -32,6 +32,7 @@
         watch: {
             value() {
                 this.$refs['StringEditor'].textContent = this.value;
+                this.endEditingFlag = true;
             }
         }
     }

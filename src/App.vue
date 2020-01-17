@@ -18,7 +18,7 @@ export default {
     return {
       columns: [
           { name: 'First', alias: 'a', index: 2, sortable: true, customRenderer: TestCellRenderer, editable: true },
-          { name: 'Second', alias: 'b', index: 3, type: 'number' },
+          { name: 'Second', alias: 'b', index: 3, type: 'number', editable: true },
           { name: '3ii', alias: 'z', index: 1, editable: true, customEditor: TestCellEditor },
           { name: 'Chetvertii', alias: 'r', index: 0, sortable: true, type: 'html', editable: true },
       ],

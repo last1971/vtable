@@ -4,11 +4,7 @@
             <tr>
                 <th v-for="(col, i) in sortTableCols" :key="i">
                     <div class="header">{{ col.name }}</div>
-                    <div v-if="col.sortable" @click="sorting(i)" class="header">
-                        <span v-if="col.orderBy === 'ASC'">\/</span>
-                        <span v-else-if="col.orderBy === 'DESC'">/\</span>
-                        <span v-else> -- </span>
-                    </div>
+                    <sorter :value="sortTableCols[i]" @input="sorting"/>
                 </th>
             </tr>
         </thead>
@@ -32,9 +28,11 @@
     import TableCol from "./TableCol";
     import CellRenderer from "./CellRenderer";
     import StringEditor from "./StringEditor";
+    import NumberEditor from "./NumberEditor";
+    import Sorter from "@/Sorter";
     export default {
         name: "VTable",
-        components: { StringEditor, CellRenderer },
+        components: {Sorter, StringEditor, CellRenderer },
         props: {
             columns: { type: Array },
             rows: { type: Array, required: true },
@@ -63,6 +61,7 @@
             },
             cellEditor(i) {
                 if (this.sortTableCols[i].customEditor) return this.sortTableCols[i].customEditor;
+                if (this.sortTableCols[i].type === 'number') return NumberEditor;
                 return StringEditor;
             },
             endEditing(value) {
@@ -79,11 +78,8 @@
             setEditing(i, j) {
                 if (i >=0 && this.sortTableCols[i].editable) this.cellEditing = { i, j };
             },
-            sorting(i) {
-                const col = this.sortTableCols[i];
-                if (col.orderBy === 'ASC') col.orderBy = 'DESC';
-                else if (col.orderBy === 'DESC') col.orderBy = 'NONE';
-                else col.orderBy = 'ASC';
+            sorting(col) {
+                this.tableCols[col.originalIndex].orderBy = col.orderBy;
                 this.$emit('orderBy', col.alias || col.originalIndex, col.orderBy);
             }
         }
